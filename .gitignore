@@ -1,0 +1,10 @@
+# Built app (rebuild with `zsh build.sh`)
+*.app/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
