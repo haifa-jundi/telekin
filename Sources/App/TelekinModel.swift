@@ -32,6 +32,9 @@ final class TelekinModel: ObservableObject {
     @Published var zeroYaw: Double = 0
     @Published var zeroPitch: Double = 0
     @Published var section: Section = .home
+    /// Head tilt from neutral (degrees) and whether scroll mode is on.
+    @Published private(set) var tilt: Double = 0
+    @Published private(set) var scrollMode = false
     /// Live views only update while the window is on screen.
     var windowVisible = false
 
@@ -61,6 +64,11 @@ final class TelekinModel: ObservableObject {
         snapshot = controller.snapshot
     }
 
+    func scrollModeChanged(_ on: Bool) { scrollMode = on }
+
+    /// Fixed tilt for README screenshots (live tilt comes from the controller).
+    private var demoTilt: Double?
+
     func cursorMoved(by step: CGVector) { cursorTravel += hypot(step.dx, step.dy) }
 
     func clicked(_ kind: PointerController.ClickKind) {
@@ -70,8 +78,10 @@ final class TelekinModel: ObservableObject {
     }
 
     /// Feeds recorded or synthetic motion straight in (used to render README screenshots).
-    func replay(_ samples: [MotionSample], rate: Double, cursorSpeed: Double, clicks: Int) {
+    func replay(_ samples: [MotionSample], rate: Double, cursorSpeed: Double, clicks: Int, tilt: Double = 0) {
         windowVisible = true
+        demoTilt = tilt
+        self.tilt = tilt
         for sample in samples {
             receive(sample)
             if let latest { wandTrail.append(wandTip(for: latest)) }
@@ -107,6 +117,7 @@ final class TelekinModel: ObservableObject {
             windowStart = now
         }
         guard windowVisible, let latest, latest != sample else { return }
+        tilt = demoTilt ?? controller.currentTilt
         sample = latest
         wandTrail.append(wandTip(for: latest))
         if wandTrail.count > Self.wandTrailLength { wandTrail.removeFirst(wandTrail.count - Self.wandTrailLength) }

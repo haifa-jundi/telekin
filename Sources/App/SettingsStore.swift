@@ -29,11 +29,17 @@ struct SettingsStore {
         static let invertVertical = "invertVertical"
         static let spellTrail = "spellTrail"
         static let setupSeen = "setupSeen"
+        static let tiltScroll = "tiltScroll"
+        static let tiltDeadzone = "tiltDeadzone"
+        static let scrollSpeed = "scrollSpeed"
+        static let scrollReverse = "scrollReverse"
     }
 
     static let speedRange = 0.3...3.0
     static let deadzoneRange = 0.5...8.0
     static let accelerationRange = 0.0...1.5
+    static let tiltDeadzoneRange = 5.0...25.0
+    static let scrollSpeedRange = 0.3...3.0
 
     private let defaults: UserDefaults
 
@@ -43,6 +49,7 @@ struct SettingsStore {
         var settings = MouseSettings()
         var clicks = ClickOptions()
         var effects = EffectOptions()
+        var scroll = ScrollSettings()
     }
 
     func load() -> Snapshot {
@@ -56,6 +63,10 @@ struct SettingsStore {
         snapshot.clicks.dwellDoubleClick = flag(Key.dwellDouble) ?? true
         snapshot.clicks.stemPress = defaults.bool(forKey: Key.stemPress)
         snapshot.effects.spellTrail = flag(Key.spellTrail) ?? true
+        snapshot.scroll.tiltScroll = defaults.bool(forKey: Key.tiltScroll)
+        snapshot.scroll.tiltDeadzoneDegrees = number(Key.tiltDeadzone, in: Self.tiltDeadzoneRange) ?? snapshot.scroll.tiltDeadzoneDegrees
+        snapshot.scroll.speed = number(Key.scrollSpeed, in: Self.scrollSpeedRange) ?? snapshot.scroll.speed
+        snapshot.scroll.reverse = defaults.bool(forKey: Key.scrollReverse)
         return snapshot
     }
 
@@ -69,6 +80,10 @@ struct SettingsStore {
         defaults.set(snapshot.clicks.dwellDoubleClick, forKey: Key.dwellDouble)
         defaults.set(snapshot.clicks.stemPress, forKey: Key.stemPress)
         defaults.set(snapshot.effects.spellTrail, forKey: Key.spellTrail)
+        defaults.set(snapshot.scroll.tiltScroll, forKey: Key.tiltScroll)
+        defaults.set(snapshot.scroll.tiltDeadzoneDegrees, forKey: Key.tiltDeadzone)
+        defaults.set(snapshot.scroll.speed, forKey: Key.scrollSpeed)
+        defaults.set(snapshot.scroll.reverse, forKey: Key.scrollReverse)
     }
 
     var setupSeen: Bool {

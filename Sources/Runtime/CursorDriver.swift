@@ -40,6 +40,21 @@ enum CursorDriver {
         }
     }
 
+    private static var scrollRemainder = CGVector.zero
+
+    /// Scrolls by `delta` points (positive dy = up, positive dx = left, like a wheel) as smooth trackpad-style pixels.
+    static func scroll(by delta: CGVector) {
+        let x = scrollRemainder.dx + delta.dx
+        let y = scrollRemainder.dy + delta.dy
+        let wholeX = x.rounded(.towardZero), wholeY = y.rounded(.towardZero)
+        scrollRemainder = CGVector(dx: x - wholeX, dy: y - wholeY)
+        guard wholeX != 0 || wholeY != 0 else { return }
+        CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 2,
+                wheel1: Int32(wholeY), wheel2: Int32(wholeX), wheel3: 0)?.post(tap: .cghidEventTap)
+    }
+
+    static func resetScroll() { scrollRemainder = .zero }
+
     /// Keeps the point on the display it is on, or on the display the cursor came from.
     static func clampToDisplays(_ point: CGPoint, from origin: CGPoint) -> CGPoint {
         let displays = activeDisplayBounds()

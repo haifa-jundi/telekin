@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 enum Section: String, CaseIterable, Identifiable {
-    case home = "Wand", motion = "Motion", clicks = "Clicks", feel = "Feel", setup = "Setup", about = "About"
+    case home = "Wand", motion = "Motion", clicks = "Clicks", scroll = "Scroll", feel = "Feel", setup = "Setup", about = "About"
 
     var id: String { rawValue }
 
@@ -11,6 +11,7 @@ enum Section: String, CaseIterable, Identifiable {
         case .home: return "wand.and.stars"
         case .motion: return "waveform.path.ecg"
         case .clicks: return "cursorarrow.click.2"
+        case .scroll: return "scroll"
         case .feel: return "slider.horizontal.3"
         case .setup: return "checklist"
         case .about: return "info.circle"
@@ -40,6 +41,7 @@ struct MainView: View {
             case .home: HomeView(model: model)
             case .motion: MotionView(model: model)
             case .clicks: ClicksView(model: model)
+            case .scroll: ScrollPage(model: model)
             case .feel: FeelView(model: model)
             case .setup: SetupView(model: model)
             case .about: AboutView()

@@ -5,17 +5,19 @@ import SwiftUI
 /// It never touches the cursor, Bluetooth or permissions.
 @MainActor
 enum Screenshots {
-    static let size = CGSize(width: 900, height: 760)
+    static let size = CGSize(width: 900, height: 940)
 
     static func render(into directory: URL) -> Int32 {
         let model = TelekinModel(controller: PointerController(store: SettingsStore(defaults: UserDefaults(suiteName: "telekin.screenshots") ?? .standard)))
-        model.replay(demoMotion(), rate: 50, cursorSpeed: 412, clicks: 7)
+        model.replay(demoMotion(), rate: 50, cursorSpeed: 412, clicks: 7, tilt: 17)
         model.statusChanged(.pointing)
+        model.update { $0.scroll.tiltScroll = true }
 
         let pages: [(String, AnyView)] = [
             ("home", AnyView(HomeView(model: model))),
             ("motion", AnyView(MotionView(model: model))),
             ("clicks", AnyView(ClicksView(model: model))),
+            ("scroll", AnyView(ScrollPage(model: model))),
             ("feel", AnyView(FeelView(model: model))),
             ("setup", AnyView(SetupView(model: model))),
         ]

@@ -3,9 +3,9 @@ import Foundation
 
 /// Offline checks for the mapping logic. Run with `Telekin --self-test`; exits non-zero on failure.
 enum MappingSelfTest {
-    private static var failures: [String] = []
+    static var failures: [String] = []
 
-    private static func check(_ condition: Bool, _ name: String) {
+    static func check(_ condition: Bool, _ name: String) {
         if !condition { failures.append(name) }
     }
 
@@ -120,8 +120,10 @@ enum MappingSelfTest {
         for _ in 0..<150 { if single.update(position: CGPoint(x: 200, y: 0), time: st) != .none { singleEvents += 1 }; st += 0.02 }
         check(singleEvents == 1, "double-click can be turned off")
 
+        runScrollChecks()
+
         if failures.isEmpty {
-            print("PASS: mapping self-test (wrap, direction, inversion, dead zone, gaps, acceleration, speed, glide, dwell click and double-click)")
+            print("PASS: mapping self-test (wrap, direction, inversion, dead zone, gaps, acceleration, speed, glide, dwell click and double-click, tilt scroll, scroll mode)")
             return 0
         }
         print("FAIL: " + failures.joined(separator: "; "))

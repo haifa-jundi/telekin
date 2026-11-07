@@ -13,8 +13,14 @@ struct HomeView: View {
 
             HStack(spacing: 14) {
                 Card {
-                    StatusPill(status: model.status)
-                    Text(Theme.statusDetail(model.status)).foregroundStyle(.white.opacity(0.7)).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 8) {
+                        StatusPill(status: model.status)
+                        if model.scrollMode {
+                            Text("Scroll mode · ⌃⌥S").font(.callout.weight(.semibold)).foregroundStyle(Theme.spellEnd)
+                                .padding(.horizontal, 10).padding(.vertical, 6).background(Capsule().fill(Theme.spellEnd.opacity(0.15)))
+                        }
+                    }
+                    Text(model.scrollMode ? "Nod or turn to scroll. The cursor stays put." : Theme.statusDetail(model.status)).foregroundStyle(.white.opacity(0.7)).fixedSize(horizontal: false, vertical: true)
                 }
                 CastButton(model: model).frame(width: 220)
             }
@@ -30,6 +36,7 @@ struct HomeView: View {
                     KeyChip(keys: "⌃⌥P", label: "Pause")
                     KeyChip(keys: "⌃⌥K", label: "Click")
                     KeyChip(keys: "⌃⌥D", label: "Double-click")
+                    KeyChip(keys: "⌃⌥S", label: "Scroll mode")
                 }
             }
         }

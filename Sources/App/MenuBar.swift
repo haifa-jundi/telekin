@@ -8,6 +8,7 @@ final class MenuBar: NSObject, NSMenuDelegate {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let menu = NSMenu()
     private var hotKeys: HotKeys?
+    private var shownSymbol = "wand.and.stars"
 
     init(controller: PointerController, openWindow: @escaping (Section) -> Void) {
         self.controller = controller
@@ -24,13 +25,20 @@ final class MenuBar: NSObject, NSMenuDelegate {
             .init(keyCode: UInt32(kVK_ANSI_P), modifiers: controlOption) { [weak controller] in controller?.togglePause() },
             .init(keyCode: UInt32(kVK_ANSI_K), modifiers: controlOption) { [weak controller] in controller?.click(.single) },
             .init(keyCode: UInt32(kVK_ANSI_D), modifiers: controlOption) { [weak controller] in controller?.click(.double) },
+            .init(keyCode: UInt32(kVK_ANSI_S), modifiers: controlOption) { [weak controller] in controller?.toggleScrollMode() },
         ])
         refresh()
     }
 
     func refresh() {
         item.button?.appearsDisabled = controller.status != .pointing
-        item.button?.toolTip = "Telekin: " + Theme.statusTitle(controller.status)
+        item.button?.toolTip = "Telekin: " + Theme.statusTitle(controller.status) + (controller.scrollMode ? " · scroll mode" : "")
+        let symbol = controller.scrollMode ? "scroll" : "wand.and.stars"
+        if symbol != shownSymbol, let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Telekin") {
+            image.isTemplate = true
+            item.button?.image = image
+            shownSymbol = symbol
+        }
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -41,9 +49,11 @@ final class MenuBar: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(action("Open Telekin…", #selector(openMain), key: "o"))
         menu.addItem(action(controller.paused ? "Resume  (⌃⌥P)" : "Pause  (⌃⌥P)", #selector(togglePause)))
+        menu.addItem(toggle("Scroll mode  (⌃⌥S)", controller.scrollMode, #selector(toggleScrollMode)))
         menu.addItem(.separator())
         menu.addItem(toggle("Click by holding still", controller.clicks.dwell, #selector(toggleDwell)))
         menu.addItem(toggle("Click with AirPods press", controller.clicks.stemPress, #selector(toggleStemPress)))
+        menu.addItem(toggle("Tilt to scroll", controller.scroll.tiltScroll, #selector(toggleTiltScroll)))
         menu.addItem(toggle("Spell trail", controller.effects.spellTrail, #selector(toggleTrail)))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit Telekin", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -65,5 +75,7 @@ final class MenuBar: NSObject, NSMenuDelegate {
     @objc private func togglePause() { controller.togglePause() }
     @objc private func toggleDwell() { controller.update { $0.clicks.dwell.toggle() } }
     @objc private func toggleStemPress() { controller.update { $0.clicks.stemPress.toggle() } }
+    @objc private func toggleScrollMode() { controller.toggleScrollMode() }
+    @objc private func toggleTiltScroll() { controller.update { $0.scroll.tiltScroll.toggle() } }
     @objc private func toggleTrail() { controller.update { $0.effects.spellTrail.toggle() } }
 }

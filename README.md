@@ -23,13 +23,14 @@
 
 - **Steer with your head.** Turn left or right to move the cursor sideways, and look up or down to move it up or down. Quick turns travel further; slow ones stay precise.
 - **Click without touching anything.** Hold still for 1 second to click, or keep holding to 2 seconds to double-click. Keyboard shortcuts work too.
+- **Scroll hands-free.** Tilt your head (ear toward shoulder) to scroll: right goes down, left goes up, and leaning further scrolls faster. Or press ⌃⌥S for scroll mode, where nodding and turning scroll the page while the cursor stays put.
 - **AirPods press (experimental).** Press the stem once to click and twice to double-click.
 - **Spell trail.** Sparkles follow the cursor while you steer, and every click bursts into light. The sparkles never block what you click.
 - **See what your AirPods feel.** A live 3D head globe and rotation-speed chart.
 
 <p align="center">
   <img src="docs/screenshots/motion.png" width="49%" alt="Motion page: 3D head globe and live rotation chart">
-  <img src="docs/screenshots/clicks.png" width="49%" alt="Clicks page: hold-still click options and a practice orb">
+  <img src="docs/screenshots/scroll.png" width="49%" alt="Scroll page: a live tilt gauge and scroll settings">
 </p>
 
 ## Requirements
@@ -70,6 +71,7 @@ Then turn your head. Telekin lives in the menu bar (the wand icon); open its win
 | ⌃⌥P | Pause or resume |
 | ⌃⌥K | Click (while casting) |
 | ⌃⌥D | Double-click (while casting) |
+| ⌃⌥S | Scroll mode on or off |
 
 ## How it works
 
@@ -78,6 +80,7 @@ macOS shares AirPods head motion with apps through Apple's public headphone-moti
 - A **soft dead zone** ignores tiny drift and tremor.
 - **Acceleration** makes fast turns go further.
 - A 120 Hz **glide** smooths the 50 Hz motion so the cursor doesn't step.
+- **Tilt scrolling** measures tilt from your own neutral posture, which slowly follows you while you stay inside the dead zone, so leaning a little while reading never scrolls.
 
 Clicks are ordinary mouse events, which is why Telekin needs the Accessibility permission. Nothing leaves your Mac: no network, no analytics.
 
@@ -86,9 +89,9 @@ Clicks are ordinary mouse events, which is why Telekin needs the Accessibility p
 ```text
 Sources/
   App/        Startup, settings, the pointer controller and the window's live model
-  Mapping/    Head motion to cursor math, dwell clicks, and the offline self-test
+  Mapping/    Head motion to cursor and scroll math, dwell clicks, and the offline self-test
   Runtime/    AirPods motion, cursor events, hot keys, AirPods presses, spell trail
-  UI/         The SwiftUI window: Wand, Motion, Clicks, Feel, Setup, About
+  UI/         The SwiftUI window: Wand, Motion, Clicks, Scroll, Feel, Setup, About
 Tools/        Icon generator
 ```
 

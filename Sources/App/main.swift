@@ -30,6 +30,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.model.statusChanged(status)
             self?.menuBar?.refresh()
         }
+        controller.onScrollModeChange = { [weak self] on in
+            self?.model.scrollModeChanged(on)
+            self?.menuBar?.refresh()
+        }
         controller.onCursorMove = { [weak self, weak trail] position, step in
             trail?.isEnabled = self?.controller.effects.spellTrail ?? false
             trail?.cursorMoved(to: position)
