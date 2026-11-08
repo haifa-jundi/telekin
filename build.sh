@@ -1,5 +1,7 @@
 #!/bin/zsh
-# Builds Telekin.app (ad-hoc signed) and runs the offline self-test.
+# Builds Telekin.app, signs it, and runs the offline self-test.
+# Signing: uses the "Telekin Self-Signed" keychain identity (or $TELEKIN_SIGN_IDENTITY) when present,
+# so macOS keeps the Accessibility permission across builds. Otherwise signs ad-hoc (for this Mac only).
 set -euo pipefail
 cd -- "${0:A:h}"
 app=Telekin.app
@@ -29,6 +31,16 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>NSMotionUsageDescription</key><string>Telekin reads your AirPods head motion to move the cursor.</string>
 </dict></plist>
 PLIST
-codesign --force --sign - --timestamp=none "$app"
+identity="${TELEKIN_SIGN_IDENTITY:-Telekin Self-Signed}"
+if security find-certificate -c "$identity" >/dev/null 2>&1; then
+    # A fixed designated requirement (bundle id + certificate) is what keeps TCC grants across builds.
+    leaf="$(security find-certificate -c "$identity" -Z | awk '/SHA-1 hash:/ {print $3}')"
+    codesign --force --sign "$identity" --timestamp=none --options runtime \
+        -r="designated => identifier \"io.github.haifa-jundi.telekin\" and certificate leaf = H\"$leaf\"" "$app"
+    echo "Signed with \"$identity\""
+else
+    codesign --force --sign - --timestamp=none "$app"
+    echo "Signed ad-hoc (no \"$identity\" identity in the keychain)"
+fi
 "$app/Contents/MacOS/Telekin" --self-test
 echo "Built $app"

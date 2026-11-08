@@ -41,7 +41,22 @@
 | Headphones | AirPods with head tracking: AirPods (3rd gen), AirPods Pro, AirPods 4 or AirPods Max. Tested on AirPods (3rd gen). |
 | To build | Xcode or the Command Line Tools (`xcode-select --install`) |
 
-## Build and run
+## Install
+
+1. Download **Telekin-1.0.zip** from the [latest release](https://github.com/haifa-jundi/telekin/releases/latest) and double-click it to unzip.
+2. Drag **Telekin.app** into your **Applications** folder.
+3. Open Telekin. macOS stops it with *"Apple could not verify Telekin is free of malware"*. Click **Done**, not Move to Bin.
+4. Open **System Settings › Privacy & Security**, scroll down to *"Telekin was blocked to protect your Mac"*, and click **Open Anyway**. Confirm with your password.
+
+You only do steps 3 and 4 once.
+
+> **Why the warning?** Telekin is a free, open-source app that isn't registered with Apple (that costs $99 a year), so macOS can't vouch for it. You can read every line of the code here, or build it yourself below.
+>
+> Comfortable with Terminal? This skips steps 3 and 4: `xattr -dr com.apple.quarantine /Applications/Telekin.app`
+
+**Updating:** quit Telekin, replace the app in Applications with the new one, and open it again. Every release is signed with the same certificate, so macOS keeps your permissions.
+
+## Build from source
 
 ```bash
 git clone https://github.com/haifa-jundi/telekin.git
@@ -50,7 +65,7 @@ zsh build.sh
 open Telekin.app
 ```
 
-`build.sh` compiles the app, signs it for your Mac only, and runs the built-in self-test.
+`build.sh` compiles the app, signs it, and runs the built-in self-test. Without the project's signing certificate it signs the app for your Mac only.
 
 ## First launch
 
@@ -62,7 +77,7 @@ Telekin opens on **Setup**, which walks you through three steps:
 
 Then turn your head. Telekin lives in the menu bar (the wand icon); open its window from there.
 
-> **Rebuilt the app?** It's signed for your Mac only, so each build looks like a new app to macOS. Remove Telekin from the Accessibility list and add it again, or run `tccutil reset Accessibility io.github.haifa-jundi.telekin`.
+> **Built it yourself and the cursor stopped moving after a rebuild?** Builds signed for your Mac only look like a new app to macOS each time. Remove Telekin from the Accessibility list and add it again, or run `tccutil reset Accessibility io.github.haifa-jundi.telekin`.
 
 ## Shortcuts
 
@@ -92,7 +107,7 @@ Sources/
   Mapping/    Head motion to cursor and scroll math, dwell clicks, and the offline self-test
   Runtime/    AirPods motion, cursor events, hot keys, AirPods presses, spell trail
   UI/         The SwiftUI window: Wand, Motion, Clicks, Scroll, Feel, Setup, About
-Tools/        Icon generator
+Tools/        Icon generator and release packaging (release.sh)
 ```
 
 Developer commands:
