@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Move your Mac cursor with your AirPods.</b><br>
-  Turn your head, and the cursor follows. Hold still, and it clicks. No hands on the trackpad.
+  Turn your head, and the cursor follows. Hold still, or just say “click”, and it clicks. No hands on the trackpad.
 </p>
 
 <p align="center">
