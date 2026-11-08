@@ -45,7 +45,7 @@
 
 ## Install
 
-1. Download **Telekin-1.0.zip** from the [latest release](https://github.com/haifa-jundi/telekin/releases/latest) and double-click it to unzip.
+1. Download the **Telekin zip** from the [latest release](https://github.com/haifa-jundi/telekin/releases/latest) and double-click it to unzip.
 2. Drag **Telekin.app** into your **Applications** folder.
 3. Open Telekin. macOS stops it with *"Apple could not verify Telekin is free of malware"*. Click **Done**, not Move to Bin.
 4. Open **System Settings › Privacy & Security**, scroll down to *"Telekin was blocked to protect your Mac"*, and click **Open Anyway**. Confirm with your password.
