@@ -11,12 +11,16 @@ struct MotionView: View {
                 Card("Head orientation") {
                     HeadGlobe(sample: model.sample, zeroYaw: model.zeroYaw, zeroPitch: model.zeroPitch)
                         .frame(height: 240)
+                        .accessibilityElement()
+                        .accessibilityLabel("Head orientation globe")
+                        .accessibilityValue(model.sample == nil ? "No motion yet" : "Turns, nods and tilts with your head. Angles below.")
                     HStack {
                         Angle3(label: "Turn", value: model.sample.map { MouseMapper.wrappedDegrees($0.yaw - model.zeroYaw) }, color: Theme.turn)
                         Angle3(label: "Nod", value: model.sample.map { $0.pitch - model.zeroPitch }, color: Theme.nod)
                         Angle3(label: "Tilt", value: model.sample?.roll, color: Theme.tilt)
                         Spacer()
                         Button("Zero", action: model.zeroOrientation).help("Make the current position zero")
+                            .accessibilityHint("Makes your current head position zero")
                     }
                 }
                 Card("Signal") {
@@ -46,6 +50,7 @@ struct MotionView: View {
                     }
                 }
                 .frame(height: 220)
+                .accessibilityLabel("Rotation speed chart for turn, nod and tilt, last few seconds")
             }
         }
     }
@@ -63,6 +68,9 @@ private struct Angle3: View {
                 .font(.system(.title3, design: .rounded).weight(.semibold)).foregroundStyle(.white).monospacedDigit()
         }
         .frame(width: 64, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(value.map { String(format: "%+.0f degrees", $0) } ?? "no data")
     }
 }
 
@@ -76,6 +84,7 @@ private struct Row: View {
             Spacer()
             Text(value).foregroundStyle(.white).monospacedDigit()
         }
+        .accessibilityElement(children: .combine)
     }
 }
 

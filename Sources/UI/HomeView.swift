@@ -62,6 +62,8 @@ private struct CastButton: View {
             .shadow(color: Theme.spellStart.opacity(casting ? 0 : 0.6), radius: 18)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(casting ? "Pause Telekin" : "Cast: start moving the cursor with your head")
+        .accessibilityHint(available ? "Shortcut: Control Option P" : "Finish Setup first")
         .disabled(!available)
         .opacity(available ? 1 : 0.4)
         .help(available ? "⌃⌥P" : "Finish Setup first")
@@ -83,6 +85,9 @@ private struct Stat: View {
             }
             Text(label).font(.caption).foregroundStyle(.white.opacity(0.6))
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue("\(Int(value.rounded())) \(unit)")
     }
 }
 
@@ -104,8 +109,12 @@ struct WandStage: View {
                 drawBurst(in: &context, size: size)
             }
         }
+        .accessibilityElement()
+        .accessibilityLabel("Wand preview")
+        .accessibilityValue(model.sample == nil ? "Waiting for your head" : "The glowing tip follows your head")
         .overlay(alignment: .topTrailing) {
             Button("Center") { model.zeroOrientation() }
+                .accessibilityLabel("Center the wand")
                 .padding(14)
                 .help("Make the current head position the center")
         }

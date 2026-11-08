@@ -24,6 +24,7 @@ struct SetupView: View {
             Card {
                 HStack(spacing: 12) {
                     Image(systemName: model.isReady ? "wand.and.stars" : "hourglass")
+                        .accessibilityHidden(true)
                         .font(.title).foregroundStyle(model.isReady ? AnyShapeStyle(Theme.spell) : AnyShapeStyle(Color.white.opacity(0.5)))
                     VStack(alignment: .leading) {
                         Text(model.isReady ? "You're ready. Turn your head!" : "Finish the steps above")
@@ -58,6 +59,8 @@ private struct Step: View {
                     if done { Image(systemName: "checkmark").font(.headline).foregroundStyle(.white) }
                     else { Text("\(number)").font(.headline).foregroundStyle(.white) }
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Step \(number), \(done ? "done" : "to do")")
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title).font(.headline).foregroundStyle(.white)
                     Text(detail).foregroundStyle(.white.opacity(0.65)).fixedSize(horizontal: false, vertical: true)

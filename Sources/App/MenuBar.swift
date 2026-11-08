@@ -56,6 +56,7 @@ final class MenuBar: NSObject, NSMenuDelegate {
         menu.addItem(toggle("Tilt to scroll", controller.scroll.tiltScroll, #selector(toggleTiltScroll)))
         menu.addItem(toggle("Spell trail", controller.effects.spellTrail, #selector(toggleTrail)))
         menu.addItem(.separator())
+        menu.addItem(toggle("Open at login", LoginItem.state != .off, #selector(toggleLoginItem)))
         menu.addItem(NSMenuItem(title: "Quit Telekin", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
@@ -78,4 +79,13 @@ final class MenuBar: NSObject, NSMenuDelegate {
     @objc private func toggleScrollMode() { controller.toggleScrollMode() }
     @objc private func toggleTiltScroll() { controller.update { $0.scroll.tiltScroll.toggle() } }
     @objc private func toggleTrail() { controller.update { $0.effects.spellTrail.toggle() } }
+    @objc private func toggleLoginItem() {
+        if let problem = LoginItem.set(LoginItem.state == .off) {
+            let alert = NSAlert()
+            alert.messageText = problem
+            alert.runModal()
+        } else if LoginItem.state == .needsApproval {
+            LoginItem.openSystemSettings()
+        }
+    }
 }

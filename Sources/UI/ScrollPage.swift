@@ -11,6 +11,10 @@ struct ScrollPage: View {
                 TiltGauge(tilt: model.tilt, deadzone: model.snapshot.scroll.tiltDeadzoneDegrees,
                           active: model.snapshot.scroll.tiltScroll && model.status == .pointing && !model.scrollMode)
                     .frame(height: 200)
+                    .accessibilityElement()
+                    .accessibilityLabel("Tilt gauge")
+                    .accessibilityValue(TiltGauge.spokenValue(tilt: model.tilt, deadzone: model.snapshot.scroll.tiltDeadzoneDegrees,
+                                                              active: model.snapshot.scroll.tiltScroll && model.status == .pointing && !model.scrollMode))
                 HStack {
                     Text("Your current posture is neutral. Lean further to scroll faster.")
                         .font(.caption).foregroundStyle(.white.opacity(0.55))
@@ -56,8 +60,12 @@ private struct ScrollSliderRow: View {
                 Spacer()
                 Text(String(format: format, value)).foregroundStyle(.white.opacity(0.7)).monospacedDigit()
             }
+            .accessibilityHidden(true) // The slider below speaks the title and value.
             SpellSlider(value: $value, range: range)
-            Text(hint).font(.caption).foregroundStyle(.white.opacity(0.5))
+                .accessibilityLabel(title)
+                .accessibilityValue(String(format: format, value))
+                .accessibilityHint(hint)
+            Text(hint).font(.caption).foregroundStyle(.white.opacity(0.5)).accessibilityHidden(true)
         }
     }
 }
@@ -70,6 +78,12 @@ struct TiltGauge: View {
     let active: Bool
 
     private static let span = 45.0 // degrees shown on each side
+
+    static func spokenValue(tilt: Double, deadzone: Double, active: Bool) -> String {
+        let degrees = String(format: "%.0f degrees %@", abs(tilt), tilt >= 0 ? "right" : "left")
+        guard active, abs(tilt) > deadzone else { return "Tilted \(degrees), not scrolling" }
+        return "Tilted \(degrees), scrolling \(tilt > 0 ? "down" : "up")"
+    }
 
     var body: some View {
         Canvas { context, size in

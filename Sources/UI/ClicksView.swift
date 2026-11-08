@@ -61,6 +61,8 @@ private struct PracticeTarget: View {
                         .overlay(Image(systemName: "sparkles").foregroundStyle(.white))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Practice orb")
+                .accessibilityHint("Click it and it jumps somewhere else")
                 .position(x: position.x * geometry.size.width, y: position.y * geometry.size.height)
             }
         }

@@ -27,6 +27,8 @@
 - **AirPods press (experimental).** Press the stem once to click and twice to double-click.
 - **Spell trail.** Sparkles follow the cursor while you steer, and every click bursts into light. The sparkles never block what you click.
 - **See what your AirPods feel.** A live 3D head globe and rotation-speed chart.
+- **Open at login.** Turn it on in Feel or the menu bar, and Telekin is ready whenever your AirPods are.
+- **Spoken labels.** Controls, gauges and charts in the window have names for VoiceOver and Voice Control.
 
 <p align="center">
   <img src="docs/screenshots/motion.png" width="49%" alt="Motion page: 3D head globe and live rotation chart">

@@ -8,7 +8,7 @@ app=Telekin.app
 compiled="$(mktemp -d)"
 trap 'rm -rf "$compiled"' EXIT
 xcrun swiftc -swift-version 5 -O Sources/**/*.swift -o "$compiled/Telekin" \
-    -framework AppKit -framework CoreMotion -framework AVFAudio -framework ApplicationServices -framework Carbon -framework MediaPlayer -framework SwiftUI -framework Charts -framework QuartzCore
+    -framework AppKit -framework CoreMotion -framework AVFAudio -framework ApplicationServices -framework Carbon -framework MediaPlayer -framework SwiftUI -framework Charts -framework QuartzCore -framework ServiceManagement
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 mv -f "$compiled/Telekin" "$app/Contents/MacOS/Telekin"
 # Icon: regenerate with `swift Tools/make_icon.swift` if Assets/AppIcon.icns is missing.

@@ -30,7 +30,7 @@ struct MainView: View {
             .navigationSplitViewColumnWidth(190)
             .safeAreaInset(edge: .bottom) {
                 HStack(spacing: 6) {
-                    Circle().fill(Theme.statusColor(model.status)).frame(width: 8, height: 8)
+                    Circle().fill(Theme.statusColor(model.status)).frame(width: 8, height: 8).accessibilityHidden(true)
                     Text(model.status == .pointing ? String(format: "%.0f Hz · casting", model.rateHz) : Theme.statusTitle(model.status))
                         .font(.caption).foregroundStyle(.secondary)
                 }

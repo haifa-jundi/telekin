@@ -109,6 +109,14 @@ struct KeyChip: View {
                 .background(RoundedRectangle(cornerRadius: 6).fill(.white.opacity(0.12)))
             Text(label).foregroundStyle(.white.opacity(0.75))
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label): \(Self.spoken(keys))")
+    }
+
+    /// "⌃⌥P" read aloud as "Control Option P".
+    static func spoken(_ keys: String) -> String {
+        let names: [Character: String] = ["⌃": "Control", "⌥": "Option", "⇧": "Shift", "⌘": "Command"]
+        return keys.map { names[$0] ?? String($0) }.joined(separator: " ")
     }
 }
 
@@ -124,6 +132,8 @@ struct StatusPill: View {
         }
         .padding(.horizontal, 12).padding(.vertical, 6)
         .background(Capsule().fill(.white.opacity(0.08)))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Status: \(Theme.statusTitle(status))")
     }
 }
 
@@ -161,7 +171,8 @@ struct SpellToggleStyle: ToggleStyle {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(configuration.isOn ? [.isSelected] : [])
+        // VoiceOver and Voice Control see a standard switch, not a plain button.
+        .accessibilityRepresentation { Toggle(isOn: configuration.$isOn) { configuration.label } }
     }
 }
 

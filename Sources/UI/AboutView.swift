@@ -13,7 +13,7 @@ struct AboutView: View {
             Card {
                 HStack(spacing: 16) {
                     if let icon = NSApp.applicationIconImage {
-                        Image(nsImage: icon).resizable().frame(width: 72, height: 72)
+                        Image(nsImage: icon).resizable().frame(width: 72, height: 72).accessibilityHidden(true)
                     }
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Telekin").font(.system(size: 24, weight: .bold, design: .rounded)).foregroundStyle(.white)
