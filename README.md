@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/demo.mp4"><img src="docs/demo.gif" width="720" alt="Demo: wearing AirPods, the user turns her head and the cursor moves across Telekin, Google and GitHub without touching the Mac"></a><br>
+  <a href="docs/demo.mp4"><img src="docs/demo.gif" width="720" alt="Demo: wearing AirPods, a head turn moves the cursor across Telekin, Google and GitHub without touching the Mac"></a><br>
   <sub>Hands off the trackpad, the whole time. <a href="docs/demo.mp4">Watch the full video with sound</a>.</sub>
 </p>
 
