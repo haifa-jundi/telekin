@@ -53,6 +53,7 @@ final class MenuBar: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(toggle("Click by holding still", controller.clicks.dwell, #selector(toggleDwell)))
         menu.addItem(toggle("Click with AirPods press", controller.clicks.stemPress, #selector(toggleStemPress)))
+        menu.addItem(toggle("Voice commands", controller.snapshot.voice.enabled, #selector(toggleVoice)))
         menu.addItem(toggle("Tilt to scroll", controller.scroll.tiltScroll, #selector(toggleTiltScroll)))
         menu.addItem(toggle("Spell trail", controller.effects.spellTrail, #selector(toggleTrail)))
         menu.addItem(.separator())
@@ -76,6 +77,7 @@ final class MenuBar: NSObject, NSMenuDelegate {
     @objc private func togglePause() { controller.togglePause() }
     @objc private func toggleDwell() { controller.update { $0.clicks.dwell.toggle() } }
     @objc private func toggleStemPress() { controller.update { $0.clicks.stemPress.toggle() } }
+    @objc private func toggleVoice() { controller.update { $0.voice.enabled.toggle() } }
     @objc private func toggleScrollMode() { controller.toggleScrollMode() }
     @objc private func toggleTiltScroll() { controller.update { $0.scroll.tiltScroll.toggle() } }
     @objc private func toggleTrail() { controller.update { $0.effects.spellTrail.toggle() } }

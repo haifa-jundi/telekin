@@ -18,8 +18,8 @@ enum CursorDriver {
     static func move(by delta: CGVector) -> CGPoint {
         let current = position
         let target = clampToDisplays(CGPoint(x: current.x + delta.dx, y: current.y + delta.dy), from: current)
-        // While the left button is held (trackpad click-and-hold), the move must be a drag.
-        let dragging = CGEventSource.buttonState(.combinedSessionState, button: .left)
+        // While the left button is held (trackpad click-and-hold, or a spoken "drag"), the move must be a drag.
+        let dragging = holding || CGEventSource.buttonState(.combinedSessionState, button: .left)
         guard let event = CGEvent(mouseEventSource: nil, mouseType: dragging ? .leftMouseDragged : .mouseMoved,
                                   mouseCursorPosition: target, mouseButton: .left) else { return current }
         event.setIntegerValueField(.mouseEventDeltaX, value: Int64((target.x - current.x).rounded()))
@@ -30,6 +30,7 @@ enum CursorDriver {
 
     /// Left click; `count` 2 sends a double-click (apps read the click count from each event).
     static func click(count: Int = 1) {
+        release()
         let point = position
         for clickNumber in 1...max(1, count) {
             for type in [CGEventType.leftMouseDown, .leftMouseUp] {
@@ -38,6 +39,33 @@ enum CursorDriver {
                 event.post(tap: .cghidEventTap)
             }
         }
+    }
+
+    static func rightClick() {
+        release()
+        post(.rightMouseDown, button: .right)
+        post(.rightMouseUp, button: .right)
+    }
+
+    /// True between `press()` and `release()`: Telekin is holding the left button down for a drag.
+    private(set) static var holding = false
+
+    /// Holds the left button down, so the next head movement drags.
+    static func press() {
+        guard !holding else { return }
+        post(.leftMouseDown, button: .left)
+        holding = true
+    }
+
+    /// Lets go of a button held by `press()`. Safe to call when nothing is held.
+    static func release() {
+        guard holding else { return }
+        post(.leftMouseUp, button: .left)
+        holding = false
+    }
+
+    private static func post(_ type: CGEventType, button: CGMouseButton) {
+        CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: position, mouseButton: button)?.post(tap: .cghidEventTap)
     }
 
     private static var scrollRemainder = CGVector.zero

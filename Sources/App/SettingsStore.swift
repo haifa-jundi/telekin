@@ -10,6 +10,11 @@ struct ClickOptions: Equatable {
     var stemPress = false
 }
 
+/// Spoken commands ("click", "scroll down"…), recognised on this Mac only.
+struct VoiceOptions: Equatable {
+    var enabled = false
+}
+
 /// Visual extras.
 struct EffectOptions: Equatable {
     /// Sparkles that follow the cursor while Telekin moves it, and burst on clicks.
@@ -33,6 +38,7 @@ struct SettingsStore {
         static let tiltDeadzone = "tiltDeadzone"
         static let scrollSpeed = "scrollSpeed"
         static let scrollReverse = "scrollReverse"
+        static let voice = "voiceCommands"
     }
 
     static let speedRange = 0.3...3.0
@@ -50,6 +56,7 @@ struct SettingsStore {
         var clicks = ClickOptions()
         var effects = EffectOptions()
         var scroll = ScrollSettings()
+        var voice = VoiceOptions()
     }
 
     func load() -> Snapshot {
@@ -67,6 +74,7 @@ struct SettingsStore {
         snapshot.scroll.tiltDeadzoneDegrees = number(Key.tiltDeadzone, in: Self.tiltDeadzoneRange) ?? snapshot.scroll.tiltDeadzoneDegrees
         snapshot.scroll.speed = number(Key.scrollSpeed, in: Self.scrollSpeedRange) ?? snapshot.scroll.speed
         snapshot.scroll.reverse = defaults.bool(forKey: Key.scrollReverse)
+        snapshot.voice.enabled = defaults.bool(forKey: Key.voice)
         return snapshot
     }
 
@@ -84,6 +92,7 @@ struct SettingsStore {
         defaults.set(snapshot.scroll.tiltDeadzoneDegrees, forKey: Key.tiltDeadzone)
         defaults.set(snapshot.scroll.speed, forKey: Key.scrollSpeed)
         defaults.set(snapshot.scroll.reverse, forKey: Key.scrollReverse)
+        defaults.set(snapshot.voice.enabled, forKey: Key.voice)
     }
 
     var setupSeen: Bool {

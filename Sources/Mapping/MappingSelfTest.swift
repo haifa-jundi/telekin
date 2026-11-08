@@ -121,9 +121,10 @@ enum MappingSelfTest {
         check(singleEvents == 1, "double-click can be turned off")
 
         runScrollChecks()
+        runVoiceChecks()
 
         if failures.isEmpty {
-            print("PASS: mapping self-test (wrap, direction, inversion, dead zone, gaps, acceleration, speed, glide, dwell click and double-click, tilt scroll, scroll mode)")
+            print("PASS: mapping self-test (wrap, direction, inversion, dead zone, gaps, acceleration, speed, glide, dwell click and double-click, tilt scroll, scroll mode, voice commands)")
             return 0
         }
         print("FAIL: " + failures.joined(separator: "; "))

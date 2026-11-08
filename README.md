@@ -24,6 +24,7 @@
 - **Steer with your head.** Turn left or right to move the cursor sideways, and look up or down to move it up or down. Quick turns travel further; slow ones stay precise.
 - **Click without touching anything.** Hold still for 1 second to click, or keep holding to 2 seconds to double-click. Keyboard shortcuts work too.
 - **Scroll hands-free.** Tilt your head (ear toward shoulder) to scroll: right goes down, left goes up, and leaning further scrolls faster. Or press ⌃⌥S for scroll mode, where nodding and turning scroll the page while the cursor stays put.
+- **Voice commands.** Say “click”, “double click”, “right click”, “drag” and “drop”, “scroll up” or “scroll down”, “pause” or “resume”, each on its own followed by a short pause, so words inside a sentence never click. Speech is recognised on your Mac only, with Apple's on-device recognition: no audio is recorded or sent. Telekin listens through the Mac's own microphone, never the AirPods mic, which would switch off head tracking. Turn it on in Clicks or the menu bar.
 - **AirPods press (experimental).** Press the stem once to click and twice to double-click.
 - **Spell trail.** Sparkles follow the cursor while you steer, and every click bursts into light. The sparkles never block what you click.
 - **See what your AirPods feel.** A live 3D head globe and rotation-speed chart.
@@ -99,15 +100,15 @@ macOS shares AirPods head motion with apps through Apple's public headphone-moti
 - A 120 Hz **glide** smooths the 50 Hz motion so the cursor doesn't step.
 - **Tilt scrolling** measures tilt from your own neutral posture, which slowly follows you while you stay inside the dead zone, so leaning a little while reading never scrolls.
 
-Clicks are ordinary mouse events, which is why Telekin needs the Accessibility permission. Nothing leaves your Mac: no network, no analytics.
+Clicks are ordinary mouse events, which is why Telekin needs the Accessibility permission. Voice commands, when you turn them on, also ask for the Microphone and Speech Recognition permissions; Telekin refuses to listen if this Mac can only recognise speech on Apple's servers. Nothing leaves your Mac: no network, no analytics.
 
 ## Project layout
 
 ```text
 Sources/
   App/        Startup, settings, the pointer controller and the window's live model
-  Mapping/    Head motion to cursor and scroll math, dwell clicks, and the offline self-test
-  Runtime/    AirPods motion, cursor events, hot keys, AirPods presses, spell trail
+  Mapping/    Head motion to cursor and scroll math, dwell clicks, voice command parsing, and the offline self-test
+  Runtime/    AirPods motion, cursor events, hot keys, AirPods presses, voice listening, spell trail
   UI/         The SwiftUI window: Wand, Motion, Clicks, Scroll, Feel, Setup, About
 Tools/        Icon generator and release packaging (release.sh)
 ```

@@ -8,7 +8,7 @@ app=Telekin.app
 compiled="$(mktemp -d)"
 trap 'rm -rf "$compiled"' EXIT
 xcrun swiftc -swift-version 5 -O Sources/**/*.swift -o "$compiled/Telekin" \
-    -framework AppKit -framework CoreMotion -framework AVFAudio -framework ApplicationServices -framework Carbon -framework MediaPlayer -framework SwiftUI -framework Charts -framework QuartzCore -framework ServiceManagement
+    -framework AppKit -framework CoreMotion -framework AVFAudio -framework ApplicationServices -framework Carbon -framework MediaPlayer -framework SwiftUI -framework Charts -framework QuartzCore -framework ServiceManagement -framework Speech -framework CoreAudio -framework AVFoundation -framework CoreMedia
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 mv -f "$compiled/Telekin" "$app/Contents/MacOS/Telekin"
 # Icon: regenerate with `swift Tools/make_icon.swift` if Assets/AppIcon.icns is missing.
@@ -28,6 +28,8 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>LSMinimumSystemVersion</key><string>15.0</string>
 <key>LSUIElement</key><true/>
 <key>NSHumanReadableCopyright</key><string>MIT License. Not affiliated with Apple.</string>
+<key>NSMicrophoneUsageDescription</key><string>Telekin listens for spoken commands like “click”. Speech is recognised on this Mac and never recorded or sent.</string>
+<key>NSSpeechRecognitionUsageDescription</key><string>Telekin turns spoken commands like “click” into clicks, using on-device recognition only.</string>
 <key>NSMotionUsageDescription</key><string>Telekin reads your AirPods head motion to move the cursor.</string>
 </dict></plist>
 PLIST
@@ -35,11 +37,11 @@ identity="${TELEKIN_SIGN_IDENTITY:-Telekin Self-Signed}"
 if security find-certificate -c "$identity" >/dev/null 2>&1; then
     # A fixed designated requirement (bundle id + certificate) is what keeps TCC grants across builds.
     leaf="$(security find-certificate -c "$identity" -Z | awk '/SHA-1 hash:/ {print $3}')"
-    codesign --force --sign "$identity" --timestamp=none --options runtime \
+    codesign --force --sign "$identity" --timestamp=none --options runtime --entitlements Telekin.entitlements \
         -r="designated => identifier \"io.github.haifa-jundi.telekin\" and certificate leaf = H\"$leaf\"" "$app"
     echo "Signed with \"$identity\""
 else
-    codesign --force --sign - --timestamp=none "$app"
+    codesign --force --sign - --timestamp=none --entitlements Telekin.entitlements "$app"
     echo "Signed ad-hoc (no \"$identity\" identity in the keychain)"
 fi
 "$app/Contents/MacOS/Telekin" --self-test

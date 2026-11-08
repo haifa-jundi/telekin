@@ -35,6 +35,9 @@ final class TelekinModel: ObservableObject {
     /// Head tilt from neutral (degrees) and whether scroll mode is on.
     @Published private(set) var tilt: Double = 0
     @Published private(set) var scrollMode = false
+    @Published private(set) var voiceState: VoiceListener.State = .off
+    /// The last spoken command, and whether Telekin carried it out.
+    @Published private(set) var lastVoiceCommand: (command: VoiceCommand, performed: Bool)?
     /// Live views only update while the window is on screen.
     var windowVisible = false
 
@@ -49,6 +52,7 @@ final class TelekinModel: ObservableObject {
         self.controller = controller
         snapshot = controller.snapshot
         status = controller.status
+        voiceState = controller.voiceState
         controller.onSample = { [weak self] sample in self?.receive(sample) }
         let timer = Timer(timeInterval: Self.publishInterval, repeats: true) { [weak self] _ in self?.publish() }
         RunLoop.main.add(timer, forMode: .common)
@@ -65,6 +69,10 @@ final class TelekinModel: ObservableObject {
     }
 
     func scrollModeChanged(_ on: Bool) { scrollMode = on }
+
+    func voiceStateChanged(_ state: VoiceListener.State) { voiceState = state }
+
+    func voiceHeard(_ command: VoiceCommand, performed: Bool) { lastVoiceCommand = (command, performed) }
 
     /// Fixed tilt for README screenshots (live tilt comes from the controller).
     private var demoTilt: Double?

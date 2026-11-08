@@ -34,6 +34,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.model.scrollModeChanged(on)
             self?.menuBar?.refresh()
         }
+        controller.onVoiceStateChange = { [weak self] state in self?.model.voiceStateChanged(state) }
+        controller.onVoiceCommand = { [weak self] command, performed in self?.model.voiceHeard(command, performed: performed) }
         controller.onCursorMove = { [weak self, weak trail] position, step in
             trail?.isEnabled = self?.controller.effects.spellTrail ?? false
             trail?.cursorMoved(to: position)

@@ -13,7 +13,10 @@ final class PointerController {
         case failed(String)
     }
 
-    enum ClickKind { case single, double }
+    enum ClickKind { case single, double, right }
+
+    /// How far one spoken "scroll up" or "scroll down" moves the page, in points, before the scroll speed setting.
+    static let voiceScrollPoints = 240.0
 
     private(set) var snapshot: SettingsStore.Snapshot
     private(set) var paused = false
@@ -28,9 +31,14 @@ final class PointerController {
     var onSample: ((MotionSample) -> Void)?
     var onCursorMove: ((CGPoint, CGVector) -> Void)?
     var onClick: ((CGPoint, ClickKind) -> Void)?
+    var onVoiceStateChange: ((VoiceListener.State) -> Void)?
+    /// A command was heard; `performed` is false when Telekin was not casting and ignored it.
+    var onVoiceCommand: ((VoiceCommand, Bool) -> Void)?
 
     private let motion = HeadMotionSource()
     private let stemPresses = StemPressInput()
+    private let voice = VoiceListener()
+    var voiceState: VoiceListener.State { voice.state }
     private let store: SettingsStore
     private var mapper = MouseMapper()
     private var glide = CursorGlide()
@@ -75,6 +83,12 @@ final class PointerController {
         stemPresses.onSinglePress = { [weak self] in self?.click(.single) ?? false }
         stemPresses.onDoublePress = { [weak self] in self?.click(.double) ?? false }
         stemPresses.setEnabled(snapshot.clicks.stemPress)
+        voice.onCommand = { [weak self] command in
+            guard let self else { return }
+            self.onVoiceCommand?(command, self.perform(command))
+        }
+        voice.onStateChange = { [weak self] state in self?.onVoiceStateChange?(state) }
+        voice.setEnabled(snapshot.voice.enabled)
         let timer = Timer(timeInterval: Self.tickInterval, repeats: true) { [weak self] _ in self?.tick() }
         RunLoop.main.add(timer, forMode: .common)
         tickTimer = timer
@@ -85,6 +99,8 @@ final class PointerController {
         tickTimer?.invalidate()
         trustTimer?.invalidate()
         stemPresses.setEnabled(false)
+        voice.setEnabled(false)
+        CursorDriver.release()
         motion.stop()
     }
 
@@ -112,8 +128,40 @@ final class PointerController {
     @discardableResult
     func click(_ kind: ClickKind) -> Bool {
         guard status == .pointing else { return false }
-        CursorDriver.click(count: kind == .double ? 2 : 1)
+        if CursorDriver.holding {
+            // During a spoken drag, any click (dwell, press, shortcut, voice) means "drop here".
+            CursorDriver.release()
+            return true
+        }
+        switch kind {
+        case .single: CursorDriver.click(count: 1)
+        case .double: CursorDriver.click(count: 2)
+        case .right: CursorDriver.rightClick()
+        }
         onClick?(CursorDriver.position, kind)
+        return true
+    }
+
+    /// Carries out a spoken command. Like clicks, it only acts while casting ("resume" also works while paused).
+    @discardableResult
+    func perform(_ command: VoiceCommand) -> Bool {
+        if command == .resume {
+            guard status == .paused else { return false }
+            togglePause()
+            return true
+        }
+        guard status == .pointing else { return false }
+        switch command {
+        case .click: click(.single)
+        case .doubleClick: click(.double)
+        case .rightClick: click(.right)
+        case .drag: CursorDriver.press()
+        case .drop: CursorDriver.release()
+        case .scrollUp: CursorDriver.scroll(by: CGVector(dx: 0, dy: Self.voiceScrollPoints * snapshot.scroll.speed))
+        case .scrollDown: CursorDriver.scroll(by: CGVector(dx: 0, dy: -Self.voiceScrollPoints * snapshot.scroll.speed))
+        case .pause: togglePause()
+        case .resume: break
+        }
         return true
     }
 
@@ -132,6 +180,8 @@ final class PointerController {
             dwell.reset()
             stemPresses.setEnabled(copy.clicks.stemPress)
         }
+        voice.setEnabled(copy.voice.enabled)
+        if !copy.voice.enabled { CursorDriver.release() } // a spoken "drag" must not outlive voice commands
         store.save(copy)
     }
 
@@ -212,7 +262,10 @@ final class PointerController {
             next = .pointing
         }
         if next != status { resetMotionState() }
-        if next != .pointing { setScrollMode(false) }
+        if next != .pointing {
+            setScrollMode(false)
+            CursorDriver.release() // never leave a spoken "drag" holding the button
+        }
         status = next
     }
 }

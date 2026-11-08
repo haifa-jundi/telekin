@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// Ways to click, plus a practice target that hops around when you hit it.
@@ -12,6 +13,10 @@ struct ClicksView: View {
                     .disabled(!model.snapshot.clicks.dwell)
                 Text("Move to a target, then hold your head still. Only head-driven movement arms it: using your mouse or trackpad never triggers a click, and resting on a page while reading won't keep clicking.")
                     .font(.caption).foregroundStyle(.white.opacity(0.55)).fixedSize(horizontal: false, vertical: true)
+            }
+
+            Card("Voice · on this Mac") {
+                VoiceCommandsCard(model: model)
             }
 
             Card("AirPods press · experimental") {
@@ -33,6 +38,48 @@ struct ClicksView: View {
                     .frame(height: 230)
             }
         }
+    }
+}
+
+/// Spoken commands: the switch, what Telekin heard, and what you can say.
+private struct VoiceCommandsCard: View {
+    @ObservedObject var model: TelekinModel
+
+    var body: some View {
+        Toggle("Listen for spoken commands", isOn: model.binding(\.voice.enabled))
+        Group {
+            switch model.voiceState {
+            case .off:
+                Text("Speech is recognised on this Mac only: no audio is recorded or sent anywhere.")
+                    .foregroundStyle(.white.opacity(0.55))
+            case .listening:
+                Text(heardLine).foregroundStyle(Theme.spellEnd)
+            case .denied(let permission):
+                HStack {
+                    Text(permission == .microphone ? "Telekin needs the Microphone permission." : "Telekin needs the Speech Recognition permission.")
+                        .foregroundStyle(.orange)
+                    Spacer()
+                    Button("Open Privacy Settings") {
+                        if let url = permission.settingsURL { NSWorkspace.shared.open(url) }
+                    }
+                }
+            case .unavailable(let message):
+                Text(message).foregroundStyle(.orange)
+            }
+        }
+        .font(.caption)
+        .fixedSize(horizontal: false, vertical: true)
+
+        Text("Say: " + VoiceCommand.allCases.map { "“\($0.phrase)”" }.joined(separator: " · "))
+            .font(.callout).foregroundStyle(.white.opacity(0.8)).fixedSize(horizontal: false, vertical: true)
+        Text("Say a command on its own, then pause: words inside a sentence are ignored, so talking, calls and videos don't click. Commands work while Telekin is casting. Say “drag”, steer, then “drop” (or hold still) to move things. Telekin listens through your Mac's own microphone, never the AirPods mic: using it would switch off head tracking.")
+            .font(.caption).foregroundStyle(.white.opacity(0.55)).fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var heardLine: String {
+        guard let last = model.lastVoiceCommand else { return "Listening…" }
+        return last.performed ? "Listening · heard “\(last.command.phrase)”"
+                              : "Listening · heard “\(last.command.phrase)”, but Telekin isn't casting"
     }
 }
 
