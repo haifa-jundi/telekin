@@ -16,6 +16,11 @@
 </p>
 
 <p align="center">
+  <a href="docs/demo.mp4"><img src="docs/demo.gif" width="720" alt="Demo: wearing AirPods, the user turns her head and the cursor moves across Telekin, Google and GitHub without touching the Mac"></a><br>
+  <sub>Hands off the trackpad, the whole time. <a href="docs/demo.mp4">Watch the full video with sound</a>.</sub>
+</p>
+
+<p align="center">
   <img src="docs/screenshots/home.png" width="720" alt="Telekin's Wand page: a glowing wand tip follows your head across a starfield">
 </p>
 
